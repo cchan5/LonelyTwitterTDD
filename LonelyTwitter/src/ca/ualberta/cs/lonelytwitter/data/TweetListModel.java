@@ -1,6 +1,8 @@
 package ca.ualberta.cs.lonelytwitter.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import ca.ualberta.cs.lonelytwitter.AbstractTweet;
@@ -23,9 +25,15 @@ public class TweetListModel {
 	 * @param tweet
 	 *            Tweet to be appended to this list
 	 */
+	
 	public void addTweet(AbstractTweet tweet) {
 		// TODO: Add only when it is not a duplicate
-		tweets.add(tweet);
+		if (this.hasTweet(tweet)) {
+			throw new IllegalArgumentException("Tweet exists already");
+		} else {
+			tweets.add(tweet);
+		}
+		
 	}
 
 	/**
@@ -35,7 +43,8 @@ public class TweetListModel {
 	 */
 	public int getCount() {
 		// TODO: return real count
-		return 0;
+		
+		return tweets.size();
 	}
 
 	/**
@@ -46,8 +55,16 @@ public class TweetListModel {
 	 * @return true if this list contains the specified element
 	 */
 	public boolean hasTweet(AbstractTweet tweet) {
-		// TODO: Find if the tweet already exists
-		return false;
+		try{
+			if (tweets.contains(tweet)){
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			assert tweets != null : "Array is not initialized";
+			return false;
+		}
 	}
 
 	/**
@@ -58,7 +75,14 @@ public class TweetListModel {
 	 *            Tweet to be removed from this list, if present.
 	 */
 	public void removeTweet(AbstractTweet tweet) {
-		// TODO: Remove tweet
+		
+		try{
+			this.hasTweet(tweet);
+			tweets.remove(tweet);
+		} catch (Exception e) {
+			assert this.hasTweet(tweet) : "Tweet does not exist";
+		}
+		
 	}
 
 	/**
@@ -69,7 +93,16 @@ public class TweetListModel {
 	 */
 	public AbstractTweet[] getTweets() {
 		// TODO: return sorted list of tweets
-		return null;
+		AbstractTweet[] tweetArray = new AbstractTweet[this.getCount()];
+		
+		Comparator comparator = new TweetComparator();
+		Collections.sort(tweets, comparator);
+
+		for (int i = 0; i < this.getCount(); i++) {
+			AbstractTweet tweet  = tweets.get(i);
+			tweetArray[i] = tweet;
+		}
+		return tweetArray;
 	}
 
 	/**
@@ -78,6 +111,7 @@ public class TweetListModel {
 	 * @return The list of tweets.
 	 */
 	public List<AbstractTweet> getList() {
+		
 		return tweets;
 	}
 
@@ -87,5 +121,14 @@ public class TweetListModel {
 	 */
 	public void clear() {
 		tweets.clear();
+	}
+	
+	public class TweetComparator<Employee> implements Comparator<AbstractTweet> {
+
+	    public int compare(AbstractTweet tweet1, AbstractTweet tweet2){
+	       if(tweet1.getTweetDate().before(tweet2.getTweetDate())) return -1;
+	       if(tweet1.getTweetDate() == tweet1.getTweetDate()) return 0;
+	       return 1;
+	    }
 	}
 }
